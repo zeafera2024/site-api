@@ -2,8 +2,9 @@
   "name": "backend-agendamento-message",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -22,5 +23,8 @@
     "qrcode": "^1.5.4",
     "whatsapp-web.js": "^1.25.0",
     "ws": "^8.18.0"
-  }
+  },
+  "engines": {
+  "node": "18.17.1"
+}
 }
