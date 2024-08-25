@@ -11,6 +11,7 @@ let isConnected = false;
 
 const getChromiumExecutablePath = async () => {
   const chromiumPath = process.env.CHROME_BIN || "/usr/bin/google-chrome";
+  console.log(chromiumPath);
   return chromiumPath;
 };
 
