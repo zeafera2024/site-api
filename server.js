@@ -152,13 +152,15 @@ const simulateQRCodeGeneration = () => {
 
 simulateQRCodeGeneration();
 
-onAuthenticated(async () => {
-  await notifyAuthenticationSuccess();
-});
+setTimeout(() => {
+  onAuthenticated(async () => {
+    await notifyAuthenticationSuccess();
+  });
 
-onDisconnected(async () => {
-  await notifyDisconnection();
-});
+  onDisconnected(async () => {
+    await notifyDisconnection();
+  });
+}, 5000);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
