@@ -1,4 +1,5 @@
 const express = require("express");
+const { db } = require("./config/firebase");
 const fs = require("fs-extra");
 const app = express();
 const path = require("path");
@@ -32,11 +33,16 @@ app.use(
 
 const updateConnectionStatus = async (status, qrCodeUrl = "") => {
   try {
-    const statusData = {
-      connectionStatus: status,
-      qrCodeUrl: qrCodeUrl,
+    const docRef = db
+      .collection("connectionStatus")
+      .doc("5WOUrPm0liRirZ1fENUY");
+    const data = {
+      status,
+      qrCodeUrl,
     };
-    await fs.writeJson(statusFile, statusData);
+
+    await setDoc(docRef, data);
+    console.log("Documento sobrescrito com sucesso!");
   } catch (error) {
     console.error("Erro ao atualizar status de conexão:", error);
   }
@@ -87,10 +93,14 @@ const notifyDisconnection = async () => {
 
 const initializeConnectionStatus = async () => {
   try {
-    const statusData = await fs.readJson(statusFile);
+    const docRef = db
+      .collection("connectionStatus")
+      .doc("5WOUrPm0liRirZ1fENUY");
+    const snapshot = await docRef.get();
+    const statusData = snapshot.data();
     const initialData = JSON.stringify({
       type: "auth",
-      status: statusData.connectionStatus,
+      status: statusData.status,
       qr: statusData.qrCodeUrl,
     });
     wss.clients.forEach((client) => {
