@@ -9,9 +9,20 @@ const fs = require("fs-extra");
 
 let isConnected = false;
 
+const getChromiumExecutablePath = async () => {
+  const chromiumPath = process.env.CHROME_BIN || "/usr/bin/google-chrome";
+  return chromiumPath;
+};
+
 var client = new Client({
   puppeteer: {
-    executablePath: "/app/.heroku/pkgs/chrome/chrome",
+    executablePath: getChromiumExecutablePath(), // Utilize o caminho obtido dinamicamente
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-gpu",
+      "--disable-dev-shm-usage",
+    ],
     headless: true,
   },
   authStrategy: new LocalAuth(),
