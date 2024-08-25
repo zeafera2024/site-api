@@ -1,4 +1,5 @@
 const { Client, LocalAuth } = require("whatsapp-web.js");
+const puppeteer = require("puppeteer-core");
 const path = require("path");
 const schedule = require("node-schedule");
 const qrcode = require("qrcode");
@@ -9,6 +10,10 @@ const fs = require("fs-extra");
 let isConnected = false;
 
 var client = new Client({
+  puppeteer: {
+    executablePath: "/app/.heroku/pkgs/chrome/chrome",
+    headless: true,
+  },
   authStrategy: new LocalAuth(),
 });
 
