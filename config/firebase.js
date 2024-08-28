@@ -1,7 +1,7 @@
-//const path = require("path");
+const path = require("path");
 const admin = require("firebase-admin");
 
-// Caminho para o arquivo da chave do serviço do Firebase
+//Caminho para o arquivo da chave do serviço do Firebase
 // const serviceAccountPath = path.resolve(
 //   __dirname,
 //   "project-freela-firebase-adminsdk-86npi-98e201e06c.json"

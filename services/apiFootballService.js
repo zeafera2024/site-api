@@ -1,4 +1,5 @@
 require("dotenv").config();
+//const key = process.env.PRIVATE_KEY;
 const key = process.env.SECRET_KEY;
 
 const serieA_id = 10;
@@ -216,6 +217,7 @@ const matchTeams = async (id_team) => {
     {
       method: "GET",
       headers: {
+        //Authorization: `Bearer ${key}`,
         Authorization: `Bearer ${key}`,
         "Content-Type": "application/json",
       },
@@ -229,12 +231,11 @@ const matchTeams = async (id_team) => {
   }
   const data = await response.json();
 
-  console.log(data);
   if (data.error === 404) {
     return data.error;
   }
 
-  const partidas_campeonato = [];
+  let partidas_campeonato = [];
   for (const campeonato in data) {
     const partidas = await data[campeonato]
       .map((partida) => {
@@ -265,22 +266,23 @@ const matchTeams = async (id_team) => {
             campeonato: partida.campeonato.nome,
             placar: partida.placar,
             data_partida: partida.data_realizacao,
+            //data_partida: "2024-08-27",
             hora_partida: partida.hora_realizacao,
             data_hora_partida: partida.data_realizacao_iso,
+            //data_hora_partida: "2024-08-27T15:30:00-0300",
             estadio_id: partida.estadio.estadio_id,
             nome_estadio: partida.estadio.nome_popular,
           };
         }
-
-        // Retorne null se os critérios não forem atendidos
         return null;
       })
       .filter((partida) => partida !== null);
 
-    var partidas_totais = partidas_campeonato.concat(partidas);
+    partidas_campeonato.push(...partidas);
   }
 
-  return partidas_totais;
+  return partidas_campeonato;
 };
 
-module.exports = { getTeams, matchTeams, key };
+//matchTeams(23);
+module.exports = { getTeams, matchTeams };

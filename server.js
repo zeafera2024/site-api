@@ -1,8 +1,6 @@
 const express = require("express");
 const { db } = require("./config/firebase");
-const fs = require("fs-extra");
 const app = express();
-const path = require("path");
 const http = require("http");
 const WebSocket = require("ws");
 const cors = require("cors");
@@ -16,20 +14,21 @@ const messageRoutes = require("./routes/messageRoutes");
 const teamsRoutes = require("./routes/teamsRoutes"); // Se aplicável
 require("dotenv").config();
 
-const statusFile = path.join(__dirname, "./status.json"); // Arquivo para armazenar o status
-
 const server = http.createServer(app); // Crie um servidor HTTP com Express
 const wss = new WebSocket.Server({ server }); // Crie um servidor WebSocket
+
+app.use(
+  cors({
+    origin: "https://strong-gaufre-8c8014.netlify.app",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"],
+    // URL do frontend
+  })
+);
 
 app.use(express.json());
 app.use("/api/messages", messageRoutes);
 app.use("/api/teams", teamsRoutes);
-
-app.use(
-  cors({
-    origin: "https://seu-frontend-url.com", // URL do frontend
-  })
-);
 
 const updateConnectionStatus = async (status, qrCodeUrl = "") => {
   try {
@@ -37,11 +36,11 @@ const updateConnectionStatus = async (status, qrCodeUrl = "") => {
       .collection("connectionStatus")
       .doc("5WOUrPm0liRirZ1fENUY");
     const data = {
-      status,
-      qrCodeUrl,
+      status: status,
+      qrCodeUrl: qrCodeUrl,
     };
 
-    await setDoc(docRef, data);
+    await docRef.set(data);
     console.log("Documento sobrescrito com sucesso!");
   } catch (error) {
     console.error("Erro ao atualizar status de conexão:", error);
@@ -127,8 +126,8 @@ wss.on("connection", (ws) => {
         const response = await notifyDisconnection();
         if (response) {
           await disconnectClient();
+          console.log("Notificando");
         }
-        console.log("Notificando");
       }
     } catch (error) {
       console.error("Erro ao processar mensagem:", error);
@@ -144,9 +143,18 @@ wss.on("connection", (ws) => {
   });
 });
 
-const simulateQRCodeGeneration = () => {
-  setInterval(() => {
-    sendQRCodeToClients();
+const simulateQRCodeGeneration = async () => {
+  sendQRCodeToClients();
+  setInterval(async () => {
+    const doc = await db
+      .collection("connectionStatus")
+      .doc("5WOUrPm0liRirZ1fENUY")
+      .get();
+    const status = doc.data().status;
+    console.log("querySnapshot " + status);
+    if (status === "disconnected" || "") {
+      sendQRCodeToClients();
+    }
   }, 5000); // Ajuste o intervalo conforme necessário
 };
 
