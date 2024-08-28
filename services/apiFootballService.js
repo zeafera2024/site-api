@@ -192,12 +192,12 @@ const getTeamsCopaBR = async () => {
 
 const getTeams = async () => {
   const times = [].concat(
-    await getTeamsSerieA(),
-    await getTeamsSerieB(),
-    await getTeamsPaulista(),
-    await getTeamsSulamericana(),
-    await getTeamsLibertadores(),
-    await getTeamsCopaBR()
+    await getTeamsSerieA()
+    // await getTeamsSerieB(),
+    // await getTeamsPaulista(),
+    // await getTeamsSulamericana(),
+    // await getTeamsLibertadores(),
+    // await getTeamsCopaBR()
   );
 
   return times.filter(

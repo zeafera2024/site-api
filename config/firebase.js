@@ -1,5 +1,6 @@
 const path = require("path");
 const admin = require("firebase-admin");
+require("dotenv").config();
 
 //Caminho para o arquivo da chave do serviço do Firebase
 // const serviceAccountPath = path.resolve(
