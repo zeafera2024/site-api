@@ -19,13 +19,13 @@ const wss = new WebSocket.Server({ server }); // Crie um servidor WebSocket
 
 app.use(
   cors({
-    origin: "https://strong-gaufre-8c8014.netlify.app",
+    //origin: "https://strong-gaufre-8c8014.netlify.app",
+    origin: "http://127.0.0.1:5500",
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
     // URL do frontend
   })
 );
-
 app.use(express.json());
 app.use("/api/messages", messageRoutes);
 app.use("/api/teams", teamsRoutes);

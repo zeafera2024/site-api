@@ -3,3 +3,6 @@ npm-debug.log
 Dockerfile
 docker-compose.yml
 .dockerignore
+.wwebjs_auth
+testeTime.js
+controllers/timeController.js

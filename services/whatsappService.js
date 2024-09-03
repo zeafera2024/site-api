@@ -5,8 +5,18 @@ const qrcode = require("qrcode");
 const { db } = require("../config/firebase"); // Importe o Firestore
 const { matchTeams } = require("../services/apiFootballService");
 const fs = require("fs-extra");
+const moment = require("moment-timezone");
+const {
+  checkMatchs,
+  getDataTime,
+  convertDataTimeMatch,
+} = require("../controllers/messageController");
 
 let isConnected = false;
+let onAuthenticatedCallback = null;
+let onDisconnectedCallback = null;
+const cacheDirectory = path.join(__dirname, "../.wwebjs_auth");
+const webCache = path.join(__dirname, "../.wwebjs_cache");
 
 const puppeteerOptions = {
   args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -17,12 +27,6 @@ const client = new Client({
   authStrategy: new LocalAuth(), // Utiliza a estratégia de autenticação local para persistência de sessão
   puppeteer: puppeteerOptions,
 });
-
-const cacheDirectory = path.join(__dirname, "../.wwebjs_auth");
-const webCache = path.join(__dirname, "../.wwebjs_cache");
-
-let onAuthenticatedCallback = null;
-let onDisconnectedCallback = null;
 
 // Emissão de QR code após a inicialização do cliente
 client.initialize();
@@ -56,32 +60,60 @@ const initializeClientListeners = () => {
       onAuthenticatedCallback();
     }
 
+    const dailyGetMatchs = () => {
+      getAllDocuments();
+    };
+
+    const rule = new schedule.RecurrenceRule();
+    rule.hour = 5;
+    rule.minute = 0;
+
+    schedule.scheduleJob(rule, dailyGetMatchs);
+
     async function getAllDocuments() {
       try {
-        // Consulta todos os documentos na coleção "messages"
         const snapshot = await db.collection("messages").get();
-        // Verifica se há documentos
         if (snapshot.empty) {
           console.log("Nenhum documento encontrado.");
           return;
         }
-        // Itera sobre os documentos e imprime seus dados
         snapshot.forEach(async (doc) => {
-          const response = await matchTeams(doc.data().teamId);
+          const partidas = await matchTeams(doc.data().teamId);
+          const { today, timezoneRegion } = getDataTime();
 
-          if (response === 404) return;
+          if (partidas === 404) return;
+          const promises = partidas.map(async (partida) => {
+            const dataPartida = partida.data_hora_partida.split("T")[0];
 
-          const datetime = `${response.data_partida}T${response.hora_partida}`;
+            if (dataPartida === today) {
+              const docId = await checkMatchs(
+                partida.partida_id,
+                partida.placar,
+                doc.id
+              );
 
-          scheduleMessage(
-            doc.data().phoneNumber,
-            new Date(datetime),
-            response.partida_id,
-            response.campeonato,
-            response.placar,
-            response.hora_partida,
-            response.nome_estadio
-          );
+              if (docId != null) {
+                console.log("Vai ter jogo");
+                const adjustedTime = convertDataTimeMatch(
+                  partida.data_hora_partida,
+                  timezoneRegion
+                );
+
+                scheduleMessage(
+                  doc.data().phoneNumber,
+                  new Date(adjustedTime),
+                  partida.partida_id,
+                  partida.campeonato,
+                  partida.placar,
+                  partida.hora_partida,
+                  partida.nome_estadio,
+                  docId
+                );
+              }
+            }
+          });
+
+          await Promise.all(promises);
         });
       } catch (error) {
         console.error("Erro ao consultar documentos: ", error);
@@ -97,9 +129,6 @@ const initializeClientListeners = () => {
   client.on("ready", () => {
     isConnected = true; // Atualiza o status de conexão
     console.log("Cliente está pronto para enviar mensagens");
-
-    // Chama a função para obter todos os documentos
-    //getAllDocuments();
   });
 
   client.on("disconnected", async (reason) => {
@@ -134,9 +163,9 @@ const scheduleMessage = (
   campeonato,
   placar,
   hora_partida,
-  nome_estadio
+  nome_estadio,
+  docId
 ) => {
-  console.log(datetime);
   console.log("mensagem agendada");
   schedule.scheduleJob(datetime, async () => {
     try {
@@ -153,8 +182,8 @@ const scheduleMessage = (
       console.log(`Mensagem enviada para ${phoneNumber}`);
 
       // Apaga o documento do Firestore após o envio
-      //await db.collection("messages").doc(docId).delete();
-      //console.log(`Documento ${docId} removido do Firestore`);
+      await db.collection("matchs").doc(docId).delete();
+      console.log(`Documento ${docId} removido do Firestore`);
     } catch (error) {
       console.error(`Falha ao enviar mensagem para ${phoneNumber}: ${error}`);
     }

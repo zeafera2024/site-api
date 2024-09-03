@@ -23,7 +23,7 @@ const getTeamsSerieA = async () => {
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(
-      `Network response was not ok ${response.statusText}. Response: ${errorText}`
+      `A resposta da solitação não está ok ${response.statusText}. Response: ${errorText}`
     );
   }
   const data = await response.json();
@@ -53,7 +53,9 @@ const getTeamsSerieB = async () => {
     }
   );
   if (!response.ok) {
-    throw new Error("Network response was not ok");
+    throw new Error(
+      `A resposta da solitação não está ok ${response.statusText}. Response: ${errorText}`
+    );
   }
   const data = await response.json();
   const partidas = data.partidas["fase-unica"]["1a-rodada"];
@@ -82,7 +84,9 @@ const getTeamsPaulista = async () => {
     }
   );
   if (!response.ok) {
-    throw new Error("Network response was not ok");
+    throw new Error(
+      `A resposta da solitação não está ok ${response.statusText}. Response: ${errorText}`
+    );
   }
   const data = await response.json();
   const partidas = data.partidas["primeira-fase"]["1a-rodada"];
@@ -111,7 +115,9 @@ const getTeamsSulamericana = async () => {
     }
   );
   if (!response.ok) {
-    throw new Error("Network response was not ok");
+    throw new Error(
+      `A resposta da solitação não está ok ${response.statusText}. Response: ${errorText}`
+    );
   }
   const data = await response.json();
   const partidas = data.partidas["fase-de-grupos"]["1a-rodada"];
@@ -142,7 +148,7 @@ const getTeamsLibertadores = async () => {
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(
-      `Network response was not ok ${response.statusText}. Response: ${errorText}`
+      `A resposta da solitação não está ok ${response.statusText}. Response: ${errorText}`
     );
   }
   const data = await response.json();
@@ -172,7 +178,9 @@ const getTeamsCopaBR = async () => {
     }
   );
   if (!response.ok) {
-    throw new Error("Network response was not ok");
+    throw new Error(
+      `A resposta da solitação não está ok ${response.statusText}. Response: ${errorText}`
+    );
   }
   const data = await response.json();
   const partidas = data.partidas["primeira-fase"];
@@ -192,12 +200,12 @@ const getTeamsCopaBR = async () => {
 
 const getTeams = async () => {
   const times = [].concat(
-    await getTeamsSerieA(),
-    await getTeamsSerieB(),
-    await getTeamsPaulista(),
-    await getTeamsSulamericana(),
-    await getTeamsLibertadores(),
-    await getTeamsCopaBR()
+    await getTeamsSerieA()
+    // await getTeamsSerieB(),
+    // await getTeamsPaulista(),
+    // await getTeamsSulamericana(),
+    // await getTeamsLibertadores(),
+    // await getTeamsCopaBR()
   );
 
   return times.filter(
@@ -217,7 +225,6 @@ const matchTeams = async (id_team) => {
     {
       method: "GET",
       headers: {
-        //Authorization: `Bearer ${key}`,
         Authorization: `Bearer ${key}`,
         "Content-Type": "application/json",
       },
@@ -226,7 +233,7 @@ const matchTeams = async (id_team) => {
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(
-      `Network response was not ok ${response.statusText}. Response: ${errorText}`
+      `A resposta da solitação não está ok ${response.statusText}. Response: ${errorText}`
     );
   }
   const data = await response.json();
@@ -266,10 +273,10 @@ const matchTeams = async (id_team) => {
             campeonato: partida.campeonato.nome,
             placar: partida.placar,
             data_partida: partida.data_realizacao,
-            //data_partida: "2024-08-27",
+            //data_partida: "2024-09-03",
             hora_partida: partida.hora_realizacao,
             data_hora_partida: partida.data_realizacao_iso,
-            //data_hora_partida: "2024-08-27T15:30:00-0300",
+            //data_hora_partida: "2024-09-03T17:22:00-0300",
             estadio_id: partida.estadio.estadio_id,
             nome_estadio: partida.estadio.nome_popular,
           };
