@@ -19,7 +19,7 @@ const wss = new WebSocket.Server({ server }); // Crie um servidor WebSocket
 
 app.use(
   cors({
-    origin: "https://jogodehoje.io/",
+    origin: "https://jogodehoje.io",
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
     // URL do frontend
