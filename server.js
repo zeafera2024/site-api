@@ -19,8 +19,7 @@ const wss = new WebSocket.Server({ server }); // Crie um servidor WebSocket
 
 app.use(
   cors({
-    //origin: "https://strong-gaufre-8c8014.netlify.app",
-    origin: "http://127.0.0.1:5500",
+    origin: "https://jogodehoje.io/",
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
     // URL do frontend
