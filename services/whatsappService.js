@@ -68,8 +68,8 @@ const initializeClientListeners = () => {
     };
 
     const rule = new schedule.RecurrenceRule();
-    rule.hour = 18;
-    rule.minute = 25;
+    rule.hour = 13;
+    rule.minute = 0;
 
     schedule.scheduleJob(rule, dailyGetMatchs);
 
