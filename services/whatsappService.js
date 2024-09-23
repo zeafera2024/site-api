@@ -56,6 +56,7 @@ const initializeClientListeners = () => {
   client.on("authenticated", () => {
     console.log("Cliente autenticado");
     isConnected = true;
+    const teamsId = [];
     if (onAuthenticatedCallback) {
       onAuthenticatedCallback();
     }
@@ -66,7 +67,7 @@ const initializeClientListeners = () => {
 
     const rule = new schedule.RecurrenceRule();
     rule.hour = 17;
-    rule.minute = 0;
+    rule.minute = 15;
 
     schedule.scheduleJob(rule, dailyGetMatchs);
 
