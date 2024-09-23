@@ -65,7 +65,7 @@ const initializeClientListeners = () => {
     };
 
     const rule = new schedule.RecurrenceRule();
-    rule.hour = 5;
+    rule.hour = 17;
     rule.minute = 0;
 
     schedule.scheduleJob(rule, dailyGetMatchs);
@@ -77,19 +77,47 @@ const initializeClientListeners = () => {
           console.log("Nenhum documento encontrado.");
           return;
         }
+
         snapshot.forEach(async (doc) => {
-          const partidas = await matchTeams(doc.data().teamId);
-          const { today, timezoneRegion } = getDataTime();
+          teamsId.push(doc.data().teamId);
+        });
 
-          if (partidas === 404) return;
-          const promises = partidas.map(async (partida) => {
-            const dataPartida = partida.data_hora_partida.split("T")[0];
+        const teamsUnique = new Set(teamsId);
+        const arrayTeamsUnique = [...teamsUnique];
 
-            if (dataPartida === today) {
+        // busca os jogos por ID
+        for (const teamId of arrayTeamsUnique) {
+          //console.log(teamId);
+          partida = await matchTeams(teamId);
+          partidas.push(...partida);
+        }
+
+        const partidasFilter = partidas.filter(
+          (partida) => partida !== false && partida !== undefined
+        );
+
+        //console.log(partidasFilter);
+
+        const { today, timezoneRegion } = getDataTime();
+        const partidasHoje = partidasFilter.filter((partida) => {
+          const dataPartida = partida.data_hora_partida.split("T")[0];
+
+          if (dataPartida === today) {
+            return partida;
+          }
+        });
+
+        snapshot.forEach(async (doc) => {
+          console.log(doc.data().teamId);
+          for (const partida of partidasHoje) {
+            if (
+              doc.data().teamId == partida.id_time_mandante ||
+              doc.data().teamId == partida.id_time_visitante
+            ) {
               const docId = await checkMatchs(
                 partida.partida_id,
                 partida.placar,
-                doc.id
+                doc.data().phoneNumber
               );
 
               if (docId != null) {
@@ -111,9 +139,7 @@ const initializeClientListeners = () => {
                 );
               }
             }
-          });
-
-          await Promise.all(promises);
+          }
         });
       } catch (error) {
         console.error("Erro ao consultar documentos: ", error);

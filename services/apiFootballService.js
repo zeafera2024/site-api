@@ -8,6 +8,7 @@ const libertadores_id = 7;
 const sulamericana_id = 8;
 const paulista_id = 9;
 const copaBR_id = 2;
+const idsChampionship = [10, 14, 7, 8, 9, 2];
 
 const getTeamsSerieA = async () => {
   const response = await fetch(
@@ -250,6 +251,8 @@ const matchTeams = async (id_team) => {
           partida_id,
           campeonato,
           placar,
+          time_mandante,
+          time_visitante,
           data_realizacao,
           hora_realizacao,
           data_realizacao_iso,
@@ -261,6 +264,8 @@ const matchTeams = async (id_team) => {
           campeonato != null &&
           campeonato.nome != null &&
           placar != null &&
+          time_mandante.time_id != null &&
+          time_visitante.time_id != null &&
           data_realizacao != null &&
           hora_realizacao != null &&
           data_realizacao_iso != null &&
@@ -272,6 +277,8 @@ const matchTeams = async (id_team) => {
             partida_id: partida.partida_id,
             campeonato: partida.campeonato.nome,
             placar: partida.placar,
+            id_time_mandante: partida.time_mandante.time_id,
+            id_time_visitante: partida.time_visitante.time_id,
             data_partida: partida.data_realizacao,
             //data_partida: "2024-09-03",
             hora_partida: partida.hora_realizacao,
@@ -291,5 +298,14 @@ const matchTeams = async (id_team) => {
   return partidas_campeonato;
 };
 
+const getMatchTeams = async () => {
+  idsChampionship.map((idChampionship) => {
+    const response = fetch(
+      `https://api.api-futebol.com.br/v1/campeonatos/${idChampionship}/partidas`
+    );
+  });
+};
+
+getMatchTeams();
 //matchTeams(23);
 module.exports = { getTeams, matchTeams };

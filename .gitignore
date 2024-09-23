@@ -3,5 +3,5 @@ config/project-freela-firebase-adminsdk-86npi-98e201e06c.json
 .env
 .wwebjs_auth/
 testeTime.js
-
+comand.txt
 controllers/timeController.js
