@@ -1,7 +1,7 @@
 const { db } = require("../config/firebase");
-const { scheduleMessage } = require("../services/whatsappService");
 const { matchTeams } = require("../services/apiFootballService");
 const moment = require("moment-timezone");
+const schedule = require("node-schedule");
 
 // Função auxiliar para obter a data e a região do timezone
 const getDataTime = () => {
@@ -14,6 +14,40 @@ const getDataTime = () => {
     today,
     timezoneRegion,
   };
+};
+
+const scheduleMessage = async (
+  phoneNumber,
+  datetime,
+  partida_id,
+  campeonato,
+  placar,
+  hora_partida,
+  nome_estadio,
+  docId
+) => {
+  console.log("mensagem agendada");
+  schedule.scheduleJob(datetime, async () => {
+    try {
+      await client.sendMessage(
+        phoneNumber,
+        `*O seu time do coração ❤️ joga hoje*
+
+👉 ${placar}
+⏱️ ${hora_partida}
+🏟️ ${nome_estadio}
+🏆 ${campeonato}
+          `
+      );
+      console.log(`Mensagem enviada para ${phoneNumber}`);
+
+      // Apaga o documento do Firestore após o envio
+      await db.collection("matchs").doc(docId).delete();
+      console.log(`Documento ${docId} removido do Firestore`);
+    } catch (error) {
+      console.error(`Falha ao enviar mensagem para ${phoneNumber}: ${error}`);
+    }
+  });
 };
 
 // Função para verificar e adicionar uma partida no Firestore

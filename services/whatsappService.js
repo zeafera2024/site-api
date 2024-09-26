@@ -182,7 +182,7 @@ const initializeClientListeners = () => {
 initializeClientListeners();
 
 // Função para enviar mensagens agendadas
-const scheduleMessage = (
+const scheduleMessage = async (
   phoneNumber,
   datetime,
   partida_id,
