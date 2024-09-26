@@ -92,7 +92,7 @@ const scheduleMessageController = async (req, res) => {
     const partidas = await matchTeams(teamId);
     const { today, timezoneRegion } = getDataTime();
 
-    const promises = partidas.map(async (partida) => {
+    for (const partida of partidas) {
       const dataPartida = partida.data_hora_partida.split("T")[0];
       if (dataPartida === today) {
         const docId = await checkMatchs(
@@ -122,9 +122,8 @@ const scheduleMessageController = async (req, res) => {
           );
         }
       }
-    });
+    }
 
-    await Promise.all(promises);
     res.status(200).send("Mensagem agendada com sucesso!");
   } catch (error) {
     console.error("Erro ao agendar mensagem:", error);
