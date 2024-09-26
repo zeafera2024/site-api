@@ -3,7 +3,7 @@ const router = express.Router();
 const { getTeams } = require("../services/apiFootballService");
 const NodeCache = require("node-cache");
 
-const cache = new NodeCache({ stdTTL: 36000 });
+const cache = new NodeCache({ stdTTL: 31557600000 });
 
 router.get("/external-data", async (req, res) => {
   const cacheKey = "teams";

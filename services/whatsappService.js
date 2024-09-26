@@ -68,8 +68,8 @@ const initializeClientListeners = () => {
     };
 
     const rule = new schedule.RecurrenceRule();
-    rule.hour = 13;
-    rule.minute = 0;
+    rule.hour = 12;
+    rule.minute = 30;
 
     schedule.scheduleJob(rule, dailyGetMatchs);
 
@@ -90,7 +90,6 @@ const initializeClientListeners = () => {
 
         // busca os jogos por ID
         for (const teamId of arrayTeamsUnique) {
-          //console.log(teamId);
           partida = await matchTeams(teamId);
           partidas.push(...partida);
         }
@@ -98,8 +97,6 @@ const initializeClientListeners = () => {
         const partidasFilter = partidas.filter(
           (partida) => partida !== false && partida !== undefined
         );
-
-        //console.log(partidasFilter);
 
         const { today, timezoneRegion } = getDataTime();
         const partidasHoje = partidasFilter.filter((partida) => {
