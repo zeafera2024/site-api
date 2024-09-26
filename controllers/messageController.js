@@ -112,7 +112,7 @@ const scheduleMessageController = async (req, res) => {
 
           scheduleMessage(
             phoneNumberAlter,
-            scheduleTime.toDate(),
+            new Date(scheduleTime),
             partida.partida_id,
             partida.campeonato,
             partida.placar,
