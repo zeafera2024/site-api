@@ -108,6 +108,8 @@ const scheduleMessageController = async (req, res) => {
             timezoneRegion
           );
 
+          console.log("schedule Message = " + scheduleMessage);
+
           console.log("Este é o scheduleTime = " + scheduleTime);
 
           scheduleMessage(
