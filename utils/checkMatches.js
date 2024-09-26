@@ -1,3 +1,5 @@
+const { db } = require("../config/firebase"); // Importe o Firestore
+
 const checkMatch = async (partida_id, placar, docIdUser) => {
   try {
     const querySnapshot = await db
