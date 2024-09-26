@@ -1,92 +1,11 @@
 const { db } = require("../config/firebase");
 const { matchTeams } = require("../services/apiFootballService");
-const moment = require("moment-timezone");
 const schedule = require("node-schedule");
+const { getDataTime, convertDataTimeMatch } = require("../utils/dataTime");
+const { checkMatch } = require("../utils/checkMatches");
+const { scheduleMessage } = require("../services/whatsappService");
 
 // Função auxiliar para obter a data e a região do timezone
-const getDataTime = () => {
-  const timezone = "America/Fortaleza";
-  const now = moment().tz(timezone);
-  const today = now.clone().format("YYYY-MM-DD");
-  const timezoneRegion = moment.tz.guess();
-
-  return {
-    today,
-    timezoneRegion,
-  };
-};
-
-const scheduleMessage = async (
-  phoneNumber,
-  datetime,
-  partida_id,
-  campeonato,
-  placar,
-  hora_partida,
-  nome_estadio,
-  docId
-) => {
-  console.log("mensagem agendada");
-  schedule.scheduleJob(datetime, async () => {
-    try {
-      await client.sendMessage(
-        phoneNumber,
-        `*O seu time do coração ❤️ joga hoje*
-
-👉 ${placar}
-⏱️ ${hora_partida}
-🏟️ ${nome_estadio}
-🏆 ${campeonato}
-          `
-      );
-      console.log(`Mensagem enviada para ${phoneNumber}`);
-
-      // Apaga o documento do Firestore após o envio
-      await db.collection("matchs").doc(docId).delete();
-      console.log(`Documento ${docId} removido do Firestore`);
-    } catch (error) {
-      console.error(`Falha ao enviar mensagem para ${phoneNumber}: ${error}`);
-    }
-  });
-};
-
-// Função para verificar e adicionar uma partida no Firestore
-const checkMatchs = async (partida_id, placar, docIdUser) => {
-  try {
-    const querySnapshot = await db
-      .collection("matchs")
-      .where("docIdUser", "==", docIdUser)
-      .where("matchID", "==", partida_id)
-      .where("matchTeams", "==", placar)
-      .get();
-
-    if (!querySnapshot.empty) {
-      console.log("Partida já cadastrada");
-      return null;
-    } else {
-      const docRef = await db.collection("matchs").add({
-        matchID: partida_id,
-        matchTeams: placar,
-        docIdUser: docIdUser,
-      });
-
-      console.log("Partida registrada - documento com ID:", docRef.id);
-      return docRef.id;
-    }
-  } catch (error) {
-    console.error("Erro ao verificar ou adicionar a partida:", error);
-    return null;
-  }
-};
-
-const convertDataTimeMatch = (datatime, timezone) => {
-  const serverMoment = moment.parseZone(datatime);
-  const convertedMoment = serverMoment.clone().tz(timezone);
-  const adjustedMoment = convertedMoment.clone().subtract(3, "hours");
-  const adjustedTime = adjustedMoment.format("YYYY-MM-DDTHH:mm:ssZ");
-
-  return adjustedTime;
-};
 
 // Função para validar dados e adicionar no Firestore
 const validateData = async (phoneNumber, teamId) => {
@@ -129,7 +48,7 @@ const scheduleMessageController = async (req, res) => {
     for (const partida of partidas) {
       const dataPartida = partida.data_hora_partida.split("T")[0];
       if (dataPartida === today) {
-        const docId = await checkMatchs(
+        const docId = await checkMatch(
           partida.partida_id,
           partida.placar,
           docIdUser
@@ -168,8 +87,5 @@ const scheduleMessageController = async (req, res) => {
 };
 
 module.exports = {
-  checkMatchs,
   scheduleMessageController,
-  getDataTime,
-  convertDataTimeMatch,
 };

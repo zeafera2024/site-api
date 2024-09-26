@@ -5,12 +5,8 @@ const qrcode = require("qrcode");
 const { db } = require("../config/firebase"); // Importe o Firestore
 const { matchTeams } = require("../services/apiFootballService");
 const fs = require("fs-extra");
-const moment = require("moment-timezone");
-const {
-  checkMatchs,
-  getDataTime,
-  convertDataTimeMatch,
-} = require("../controllers/messageController");
+const { getDataTime, convertDataTimeMatch } = require("../utils/dataTime");
+const { checkMatch } = require("../utils/checkMatches");
 
 let isConnected = false;
 let onAuthenticatedCallback = null;
@@ -114,7 +110,7 @@ const initializeClientListeners = () => {
               doc.data().teamId == partida.id_time_mandante ||
               doc.data().teamId == partida.id_time_visitante
             ) {
-              const docId = await checkMatchs(
+              const docId = await checkMatch(
                 partida.partida_id,
                 partida.placar,
                 doc.data().phoneNumber
